@@ -35,39 +35,15 @@ struct ContentView: View {
 
     func ActionButtons() -> some View {
         HStack(spacing: 12) {
-            ForEach([20, 50, 100, 250], id: \.self) { value in
+            ForEach([20, 50, 100], id: \.self, content: { (value: Int) in
                 Button("+\(value)ml") { addItem(value) }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.bordered)
                     .tint(.accent)
-            }
-        }
-    }
-
-    func Today() -> some View {
-        // Progress header for today's goal
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Today")
-                    .font(.headline)
-                Spacer()
-                Text("\(todayTotal) / \(dailyLoo) ml")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            ProgressView(value: min(Double(todayTotal), Double(dailyLoo)), total: Double(max(dailyLoo, 1)))
+            })
+            Button("+250ml") { addItem(250) }
+                .buttonStyle(.borderedProminent)
                 .tint(.accent)
-            HStack {
-                Image(systemName: todayTotal >= dailyLoo ? "checkmark.seal.fill" : "drop.fill")
-                    .foregroundStyle(todayTotal >= dailyLoo ? .green : .accent)
-                Text(todayTotal >= dailyLoo ? "Goal reached" : "Keep going")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Stepper("Goal: \(dailyLoo) ml", value: $dailyLoo, in: 250 ... 10000, step: 50)
-                    .labelsHidden()
-            }
         }
-        .padding(.vertical, 8)
     }
 
     @ViewBuilder
@@ -104,27 +80,29 @@ struct ContentView: View {
         }
     }
 
+    let columns = Array(
+        repeating: GridItem(.flexible(), spacing: 6),
+        count: 4
+    )
+
     func LooItemList() -> some View {
         ScrollView {
-            LazyVGrid(columns: [
-                GridItem(.adaptive(minimum: 90, maximum: 140), spacing: 12),
-            ], spacing: 12) {
+            LazyVGrid(columns: columns, spacing: 6) {
                 ForEach(filteredForToday) { item in
                     LooItemView(item: item) {
                         deleteItemWithUndo(item)
                     }
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
         }
+        .scrollIndicators(.hidden)
+        .padding(.horizontal)
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
-                Today()
-                    .padding(.horizontal)
+                Today(value: todayTotal)
                 LooItemList()
             }
             ActionButtons()

@@ -14,16 +14,20 @@ struct LooItemView: View {
     var action: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack {
+            HStack (spacing: -4) {
+                Circle().fill(.blue).frame(width: 12)
+                Circle().fill(.blue.opacity(0.4)).frame(width: 12)
+            }
             Text("\(item.amount) ml")
-                .font(.headline)
+                .bold()
             Text(item.timestamp, style: .time)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.accent.opacity(0.1))
+        .padding(.horizontal)
+        .padding(.vertical, 6)
+        .background(.black.opacity(0.05))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .onTapGesture {
