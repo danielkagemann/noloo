@@ -110,19 +110,7 @@ struct ContentView: View {
                 GridItem(.adaptive(minimum: 90, maximum: 140), spacing: 12),
             ], spacing: 12) {
                 ForEach(filteredForToday) { item in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("\(item.amount) ml")
-                            .font(.headline)
-                        Text(item.timestamp, style: .time)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.accent.opacity(0.2))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .onTapGesture {
+                    LooItemView(item: item) {
                         deleteItemWithUndo(item)
                     }
                 }

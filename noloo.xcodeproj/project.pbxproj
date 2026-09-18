@@ -6,15 +6,8 @@
 	objectVersion = 90;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		9B866D3C305D45CB0016E13E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B866D3B305D45CB0016E13E /* SettingsView.swift */; };
-		9B866D3E305D45DF0016E13E /* WeeklySummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B866D3D305D45DF0016E13E /* WeeklySummaryView.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* noloo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = noloo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9B866D3B305D45CB0016E13E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		9B866D3D305D45DF0016E13E /* WeeklySummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklySummaryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -38,8 +31,6 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000010 /* noloo */,
-				9B866D3B305D45CB0016E13E /* SettingsView.swift */,
-				9B866D3D305D45DF0016E13E /* WeeklySummaryView.swift */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -119,8 +110,6 @@
 		000000000000000120000000 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				9B866D3E305D45DF0016E13E /* WeeklySummaryView.swift in Sources */,
-				9B866D3C305D45CB0016E13E /* SettingsView.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
