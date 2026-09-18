@@ -10,6 +10,9 @@ import SwiftUI
 struct Today: View {
     /// input
     let value: Int
+    
+    /// states
+    @State private var showSettings: Bool = false
 
     /// app storage for daily goal (in ml)
     @AppStorage("DailyLoo") private var dailyLoo: Int = 2000
@@ -19,6 +22,8 @@ struct Today: View {
         let remaining = dailyLoo - value
         if remaining > 0 {
             Text("Only \(dailyLoo - value)ml missing. ").padding(.top, 8)
+        } else {
+            Text("💧 You have reached your daily goal!")
         }
     }
 
@@ -39,6 +44,12 @@ struct Today: View {
             }
         }
         .padding()
+        .onTapGesture {
+            showSettings.toggle()
+        }
+        .sheet(isPresented: $showSettings, content: {
+            SettingsView()
+        })
     }
 }
 

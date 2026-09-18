@@ -32,6 +32,15 @@ struct ContentView: View {
             (startOfDay ... endOfDay).contains(item.timestamp)
         }
     }
+    
+    @ViewBuilder
+    func EmptyState()-> some View {
+        if filteredForToday.isEmpty {
+            Text ("You should drink something. Choose the amount at the bottom. If you want to change your goal just tap on the header. ")
+                .padding(.horizontal)
+                .padding(.vertical, 32)
+        }
+    }
 
     func ActionButtons() -> some View {
         HStack(spacing: 12) {
@@ -87,6 +96,7 @@ struct ContentView: View {
 
     func LooItemList() -> some View {
         ScrollView {
+            EmptyState()
             LazyVGrid(columns: columns, spacing: 6) {
                 ForEach(filteredForToday) { item in
                     LooItemView(item: item) {
@@ -100,12 +110,12 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             VStack {
                 Today(value: todayTotal)
                 LooItemList()
+                ActionButtons()
             }
-            ActionButtons()
             Notification()
         }
     }
