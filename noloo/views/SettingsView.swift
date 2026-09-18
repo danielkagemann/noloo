@@ -33,7 +33,6 @@ struct SettingsView: View {
             .buttonStyle(.borderedProminent).tint(.accent)
             .padding(.top, 32)
         }
-        .navigationTitle("Settings")
     }
 }
 

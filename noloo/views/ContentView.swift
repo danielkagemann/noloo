@@ -32,11 +32,14 @@ struct ContentView: View {
             (startOfDay ... endOfDay).contains(item.timestamp)
         }
     }
-    
+
     @ViewBuilder
-    func EmptyState()-> some View {
+    func EmptyState() -> some View {
         if filteredForToday.isEmpty {
-            Text ("You should drink something. Choose the amount at the bottom. If you want to change your goal just tap on the header. ")
+            Text("You should drink something.\nChoose the amount at the bottom.\nIf you want to change your goal just tap on the header. ")
+                .flipX(from: 90, to: 0, duration: 1)
+                .slideDown(value: 100, delay: 0.2)
+                .multilineTextAlignment(.center)
                 .padding(.horizontal)
                 .padding(.vertical, 32)
         }
@@ -48,10 +51,17 @@ struct ContentView: View {
                 Button("+\(value)ml") { addItem(value) }
                     .buttonStyle(.bordered)
                     .tint(.accent)
+                    .slideUp(value: 50, delay: Double(value/1000))
+                    .flyingSymbol {
+                        Image(systemName: "drop.fill")
+                                .font(.title3)
+                                .foregroundStyle(.blue)
+                    }
             })
             Button("+250ml") { addItem(250) }
                 .buttonStyle(.borderedProminent)
                 .tint(.accent)
+                .slideUp(value: 10, delay: 0.25)
         }
     }
 
@@ -84,8 +94,7 @@ struct ContentView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .padding(.horizontal)
             .padding(.top)
-            .transition(.move(edge: .top).combined(with: .opacity))
-            .animation(.spring(duration: 0.35), value: bannerMessage)
+            .slideDown(value: 50)
         }
     }
 

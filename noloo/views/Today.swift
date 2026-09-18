@@ -20,7 +20,9 @@ struct Today: View {
     @ViewBuilder
     func Missing() -> some View {
         let remaining = dailyLoo - value
-        if remaining > 0 {
+        if remaining == dailyLoo {
+            Text("Start now.").padding(.top, 8)
+        } else if remaining > 0 {
             Text("Only \(dailyLoo - value)ml missing. ").padding(.top, 8)
         } else {
             Text("💧 You have reached your daily goal!")
@@ -33,10 +35,13 @@ struct Today: View {
                 VStack(alignment: .leading, spacing: -2) {
                     Text("Today")
                         .font(.headline)
+                        .flipX(from: -180, to: 0)
                     Text("\(value) ml").font(.title).bold()
+                        .slideRight(value: 100, delay: 0.1)
                     Text("von \(dailyLoo) ml")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .fadeIn()
                     Missing()
                 }
                 Spacer()
