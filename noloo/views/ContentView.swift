@@ -96,14 +96,36 @@ struct ContentView: View {
                 }
                 
                 if filteredForToday.count > 3 {
-                    Button("Mehr") {
+                    Button(action: {
                         showAllItems.toggle()
-                    }
+                    }, label: {
+                        VStack {
+                            Text("+\(filteredForToday.count - 3)")
+                            Text("weitere")
+                        }
+                    })
                 }
             }
             Spacer()
         }
         .padding(.horizontal)
+    }
+    
+    var whichGlas: String {
+        let percent = (todayTotal * 100) / dailyLoo
+        if percent < 25 {
+            return "glas-0"
+        }
+        if percent < 50 {
+            return "glas-25"
+        }
+        if percent < 75 {
+            return "glas-50"
+        }
+        if percent < 100 {
+            return "glas-75"
+        }
+        return "glas-100"
     }
 
     var body: some View {
@@ -123,9 +145,15 @@ struct ContentView: View {
             }
         } else {
             ZStack(alignment: .bottom) {
-                VStack {
+                VStack (spacing: 32) {
                     LastDaysView()
-                    Today(value: todayTotal)
+                    HStack {
+                        Image(whichGlas)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 200)
+                        Today(value: todayTotal)
+                    }
                     LooItemList()
                     ActionButtons()
                 }

@@ -9,12 +9,13 @@ import SwiftUI
 
 struct EmptyLooView: View {
     var body: some View {
-        Image(systemName: "drop.fill")
-            .font(.system(size: 84))
-            .foregroundStyle(.blue)
+        Image("noloo")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 128)
             .animSlideDown(bounce: .default)
         
-        Text("You should drink something.\nChoose the amount at the bottom.\nIf you want to change your goal just tap on the header. ")
+        Text("Du hast heute noch nichts getrunken.\nFange jetzt damit an um auf Deine\nTagesmenge zu kommen.\nDiese kannst Du ändern, \nwenn Du oben tippst. ")
             .animSlideDown(value: 40, delay: 0.2)
             .multilineTextAlignment(.center)
             .padding(.horizontal)
