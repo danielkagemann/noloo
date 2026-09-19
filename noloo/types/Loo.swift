@@ -30,14 +30,14 @@ extension Array where Element: Loo {
         self.reduce(0) { $0 + $1.amount }
     }
     
-    func lastWeekAmount() -> [Int] {
-        var total: [Int] = []
+    func lastWeekAmount() -> [Date:Int] {
+        var total: [Date:Int] = [:]
         var current: Date = Date()
         
         for _ in 1...7 {
-            guard let newDay = Calendar.current.date(byAdding: DateComponents(day: -1), to: current) else {return []}
+            guard let newDay = Calendar.current.date(byAdding: DateComponents(day: -1), to: current) else {return [:]}
             current = newDay
-            total.append(self.filterByDate(current).totalAmount())
+            total[current] = self.filterByDate(current).totalAmount()
         }
         
         return total

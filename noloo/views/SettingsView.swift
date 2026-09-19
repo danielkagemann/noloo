@@ -16,23 +16,26 @@ struct SettingsView: View {
 
     var body: some View {
         VStack {
-            Text("Change you daily goal. Please note that this has impact on all daily consumptions.").foregroundStyle(.secondary)
+            Text("Ändere das tägliche Ziel. Dies hat Auswirkungen auf die bisher eingetragenen Werte.")
+                .foregroundStyle(.secondary)
 
             TextField("",
                       value: $dailyLoo,
                       format: .number,
-                      prompt: Text("Your new goal"))
+                      prompt: Text("Neues Ziel..."))
                 .keyboardType(.numberPad)
                 .multilineTextAlignment(.center)
                 .font(.title)
             Text("ml")
 
-            Button("Close") {
+            Button("Fertig") {
                 dismiss()
             }
-            .buttonStyle(.borderedProminent).tint(.accent)
+            .buttonStyle(.borderedProminent)
+            .tint(.accent)
             .padding(.top, 32)
         }
+        .padding()
     }
 }
 

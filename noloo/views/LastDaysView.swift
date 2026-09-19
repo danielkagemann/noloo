@@ -16,20 +16,19 @@ struct LastDaysView: View {
     @Query var items: [Loo]
 
     /// get the last 7 days
-    var week: [Int] {
+    var week: [Date:Int] {
         items.lastWeekAmount()
     }
 
     var body: some View {
-        HStack {
-            ForEach(week, id: \.self) { val in
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
+            ForEach(week.sorted(by: { $0.key < $1.key }), id: \.key) { date, value in
                 VStack {
-                    if val < dailyLoo {
-                        Text("☔️")
-                    } else {
-                        Text("💧")
-                    }
-                    Text("\(val)ml")
+                    Text(date.toFormat("EEE"))
+                        .font(.caption)
+                    Text("\(value)ml")
+                        .font(.callout)
+                        .fontWeight(value < dailyLoo ? .regular : .bold)
                 }
             }
         }

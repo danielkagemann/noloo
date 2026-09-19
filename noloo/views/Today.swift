@@ -21,39 +21,64 @@ struct Today: View {
     func Missing() -> some View {
         let remaining = dailyLoo - value
         if remaining > 0 {
-            Text("Only \(dailyLoo - value)ml missing. ")
+            HStack (spacing: 16){
+                Image(systemName: "drop.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.accent)
+                    .animSlideDown(bounce: .default)
+                VStack (alignment: .leading) {
+                    Text("Noch")
+                    Text("\(dailyLoo - value)ml")
+                        .bold()
+                        .font(.headline)
+                }
+                Spacer()
+            }
+            .padding()
+            .background(.accent.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            
         } else {
-            Text("💧 You have reached your daily goal!")
+            Text("Tagesziel erreicht!")
         }
     }
 
     var body: some View {
         if value > 0 {
+            // show today facts
             VStack {
                 HStack {
                     VStack(alignment: .leading, spacing: -2) {
-                        Text("Today")
+                        Text("Heute")
                             .font(.headline)
                             .animFlipX(from: -180, to: 0)
-                        Text("\(value) ml").font(.title).bold()
+                        Text("\(value) ml")
+                            .font(.largeTitle)
+                            .bold()
                             .animFlipX(from: -180, to: 0, duration: 0.5)
                         Text("von \(dailyLoo) ml")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .animFlipX(from: -180, to: 0, duration: 0.6)
-                        Missing()
-                            .padding(.top, 8)
-                            .animFlipX(from: -180, to: 0, duration: 0.7)
                     }
                     Spacer()
-                    Text("\((value * 100) / dailyLoo)%").bold().foregroundStyle(.secondary)
+                    Text("\((value * 100) / dailyLoo)%")
                         .animSlideLeft(delay: 0.4, bounce: .default)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 16)
+                        .foregroundStyle(.white)
+                        .font(.caption)
+                        .background(.accent.opacity(0.8))
+                        .clipShape(.capsule)
                 }
+                .onTapGesture {
+                    showSettings.toggle()
+                }
+                
+                // show missing
+                Missing()
             }
             .padding()
-            .onTapGesture {
-                showSettings.toggle()
-            }
             .sheet(isPresented: $showSettings, content: {
                 SettingsView()
             })

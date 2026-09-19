@@ -12,9 +12,11 @@ struct ContentView: View {
     /// app storage for daily goal (in ml)
     @AppStorage("DailyLoo") private var dailyLoo: Int = 2000
     
+    /// states
     @State private var bannerMessage: String? = nil
     @State private var bannerShowsUndo: Bool = false
     @State private var lastDeleted: Loo? = nil
+    @State private var showAllItems: Bool = false
 
     /// filter for the current day
     var filteredForToday: [Loo] {
@@ -56,7 +58,7 @@ struct ContentView: View {
                     .lineLimit(2)
                 Spacer()
                 if bannerShowsUndo {
-                    Button("Undo") {
+                    Button("Rückgängig") {
                         if let item = lastDeleted {
                             modelContext.insert(item)
                         }
@@ -75,26 +77,32 @@ struct ContentView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .padding(.horizontal)
             .padding(.top)
-            .animSlideDown(value: 50)
+            .animFlipY(from: 0, to: 1)
         }
     }
 
-    let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 6),
-        count: 4
-    )
-
+    @ViewBuilder
     func LooItemList() -> some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 6) {
-                ForEach(filteredForToday) { item in
+        VStack (alignment: .leading) {
+            Text("Letzte Einträge")
+                .font(.title2)
+                .alignLeft()
+            
+            HStack {
+                ForEach(filteredForToday.prefix(3)) {item in
                     LooItemView(item: item) {
                         deleteItemWithUndo(item)
                     }
                 }
+                
+                if filteredForToday.count > 3 {
+                    Button("Mehr") {
+                        showAllItems.toggle()
+                    }
+                }
             }
+            Spacer()
         }
-        .scrollIndicators(.hidden)
         .padding(.horizontal)
     }
 
@@ -114,14 +122,38 @@ struct ContentView: View {
                 Spacer()
             }
         } else {
-            ZStack(alignment: .top) {
+            ZStack(alignment: .bottom) {
                 VStack {
                     LastDaysView()
                     Today(value: todayTotal)
                     LooItemList()
                     ActionButtons()
                 }
-                Notification()
+                if !showAllItems {
+                    Notification()
+                }
+            }
+            .sheet(isPresented: $showAllItems) {
+                VStack (alignment: .leading) {
+                    Text("Alle heutigen Einträge")
+                        .font(.title2)
+                    
+                    Text("Tippe auf einen Eintrag um ihn zu löschen")
+                    
+                    ScrollView {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4), spacing: 12) {
+                            ForEach(filteredForToday) { item in
+                                LooItemView(item: item) {
+                                    deleteItemWithUndo(item)
+                                }
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
+                    Notification()
+                }
+                .padding(.vertical, 32)
+                .padding(.horizontal, 16)
             }
         }
     }
@@ -129,7 +161,7 @@ struct ContentView: View {
     private func addItem(_ value: Int) {
         let new = Loo(amount: value)
         modelContext.insert(new)
-        showBanner(message: "+\(value) ml added", showsUndo: false)
+        showBanner(message: "+\(value) ml hinzugefügt", showsUndo: false)
     }
 
     private func deleteItems(at offsets: IndexSet) {
@@ -147,7 +179,7 @@ struct ContentView: View {
         }
         undoManager?.setActionName("Delete Loo")
         modelContext.delete(item)
-        showBanner(message: "Deleted \"\(item.amount) ml\"", showsUndo: true)
+        showBanner(message: "Entferne \"\(item.amount) ml\"", showsUndo: true)
     }
 
     private func showBanner(message: String, showsUndo: Bool) {
