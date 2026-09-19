@@ -57,10 +57,10 @@ struct Flip: ViewModifier {
     var y: CGFloat = 0
     var z: CGFloat = 0
 
-    var from: CGFloat
-    var to: CGFloat
-    var duration: CGFloat = 0.8
-    var delay: CGFloat = 0
+    var from: Double
+    var to: Double
+    var duration: Double = 0.8
+    var delay: Double = 0
 
     func body(content: Content) -> some View {
         content
@@ -74,25 +74,67 @@ struct Flip: ViewModifier {
     }
 }
 
+struct Pulse: ViewModifier {
+    @State private var animate: Bool = false
+
+    var fromScale: CGFloat = 1.0
+    var toScale: CGFloat = 1.1
+    var fromOpacity: Double = 1.0
+    var toOpacity: Double = 0.9
+    var duration: Double = 0.8
+    var delay: Double = 0
+    var repeats: Bool = true
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(animate ? toScale : fromScale)
+            .opacity(animate ? toOpacity : fromOpacity)
+            .onAppear {
+                animate = false
+                let animation = Animation.easeInOut(duration: duration)
+                    .delay(delay)
+                withAnimation(repeats ? animation.repeatForever(autoreverses: true) : animation) {
+                    animate = true
+                }
+            }
+    }
+}
+
 extension View {
+    func animPulse(fromScale: CGFloat = 1.0,
+                   toScale: CGFloat = 1.1,
+                   fromOpacity: Double = 1.0,
+                   toOpacity: Double = 0.9,
+                   duration: Double = 0.8,
+                   delay: Double = 0,
+                   repeats: Bool = true) -> some View {
+        modifier(Pulse(fromScale: fromScale,
+                       toScale: toScale,
+                       fromOpacity: fromOpacity,
+                       toOpacity: toOpacity,
+                       duration: duration,
+                       delay: delay,
+                       repeats: repeats))
+    }
+
     func animScaleIn(delay: Double = 0, duration: Double = 0.5) -> some View {
         modifier(ScaleIn(delay: delay, duration: duration))
     }
 
-    func animFlipY(from: CGFloat, to: CGFloat, duration: CGFloat = 0.8, delay: CGFloat = 0) -> some View {
+    func animFlipY(from: Double, to: Double, duration: Double = 0.8, delay: Double = 0) -> some View {
         modifier(Flip(y: 1, from: from, to: to, duration: duration, delay: delay))
     }
 
-    func animFlipX(from: CGFloat, to: CGFloat, duration: CGFloat = 0.8, delay: CGFloat = 0) -> some View {
+    func animFlipX(from: Double, to: Double, duration: Double = 0.8, delay: Double = 0) -> some View {
         modifier(Flip(x: 1, from: from, to: to, duration: duration, delay:delay))
     }
 
-    func animFlipZ(from: CGFloat, to: CGFloat, duration: CGFloat = 0.8, delay: CGFloat = 0) -> some View {
+    func animFlipZ(from: Double, to: Double, duration: Double = 0.8, delay: Double = 0) -> some View {
         modifier(Flip(z: 1, from: from, to: to, duration: duration, delay:delay))
     }
 
-    func animSlideUp(value: Double = 30, delay: Double = 0) -> some View {
-        modifier(Slide(direction: .vertical, value: value, delay: delay))
+    func animSlideUp(value: Double = 30, delay: Double = 0, duration: Double = 0.8) -> some View {
+        modifier(Slide(direction: .vertical, value: value, delay: delay, duration: duration))
     }
 
     func animSlideDown(value: Double = 30, delay: Double = 0, duration: Double = 0.8) -> some View {
