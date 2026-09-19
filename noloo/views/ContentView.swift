@@ -11,33 +11,26 @@ struct ContentView: View {
 
     /// app storage for daily goal (in ml)
     @AppStorage("DailyLoo") private var dailyLoo: Int = 2000
-
+    
     @State private var bannerMessage: String? = nil
     @State private var bannerShowsUndo: Bool = false
     @State private var lastDeleted: Loo? = nil
 
-    /// sum of today's intake
-    private var todayTotal: Int {
-        filteredForToday.reduce(0) { $0 + $1.amount }
-    }
-
     /// filter for the current day
     var filteredForToday: [Loo] {
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: Date())
-        guard let endOfDay = calendar.date(byAdding: DateComponents(day: 1, second: -1), to: startOfDay) else {
-            return items
-        }
-        return items.filter { item in
-            (startOfDay ... endOfDay).contains(item.timestamp)
-        }
+        return items.filterByDate()
+    }
+
+    /// sum of today's intake
+    private var todayTotal: Int {
+        filteredForToday.totalAmount()
     }
 
     func ActionButtons() -> some View {
         HStack(spacing: 12) {
             ForEach([20, 50, 100], id: \.self, content: { (value: Int) in
                 Button("+\(value)ml") { addItem(value) }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.glass)
                     .tint(.accent)
                     .animSlideUp(value: 50, delay: Double(value / 1000))
                     .flyingSymbol {
@@ -47,7 +40,7 @@ struct ContentView: View {
                     }
             })
             Button("+250ml") { addItem(250) }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.glassProminent)
                 .tint(.accent)
                 .animSlideUp(value: 10, delay: 0.25)
         }
@@ -110,12 +103,20 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 EmptyLooView()
+                VStack (spacing: 8){
+                    ForEach([20, 50, 100, 250], id: \.self, content: { (value: Int) in
+                        Button("+\(value)ml") { addItem(value) }
+                            .buttonStyle(.glassProminent)
+                            .tint(.accent)
+                            .animSlideUp(value: 50, delay: Double(value / 1000))
+                    })
+                }
                 Spacer()
-                ActionButtons()
             }
         } else {
             ZStack(alignment: .top) {
                 VStack {
+                    LastDaysView()
                     Today(value: todayTotal)
                     LooItemList()
                     ActionButtons()

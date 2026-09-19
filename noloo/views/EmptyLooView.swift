@@ -12,10 +12,10 @@ struct EmptyLooView: View {
         Image(systemName: "drop.fill")
             .font(.system(size: 84))
             .foregroundStyle(.blue)
-            .animSlideUp(value:50, delay:0.3)
+            .animSlideDown(bounce: .default)
+        
         Text("You should drink something.\nChoose the amount at the bottom.\nIf you want to change your goal just tap on the header. ")
-            .animFlipX(from: 90, to: 0, duration: 1)
-            .animSlideDown(value: 100, delay: 0.2)
+            .animSlideDown(value: 40, delay: 0.2)
             .multilineTextAlignment(.center)
             .padding(.horizontal)
             .padding(.vertical, 32)

@@ -21,7 +21,7 @@ struct Today: View {
     func Missing() -> some View {
         let remaining = dailyLoo - value
         if remaining > 0 {
-            Text("Only \(dailyLoo - value)ml missing. ").padding(.top, 8)
+            Text("Only \(dailyLoo - value)ml missing. ")
         } else {
             Text("💧 You have reached your daily goal!")
         }
@@ -36,16 +36,18 @@ struct Today: View {
                             .font(.headline)
                             .animFlipX(from: -180, to: 0)
                         Text("\(value) ml").font(.title).bold()
-                            .animSlideRight(value: 100, delay: 0.1)
+                            .animFlipX(from: -180, to: 0, duration: 0.5)
                         Text("von \(dailyLoo) ml")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                            .animSlideUp(delay: 0.2)
+                            .animFlipX(from: -180, to: 0, duration: 0.6)
                         Missing()
+                            .padding(.top, 8)
+                            .animFlipX(from: -180, to: 0, duration: 0.7)
                     }
                     Spacer()
                     Text("\((value * 100) / dailyLoo)%").bold().foregroundStyle(.secondary)
-                        .animSlideRight(delay: 0.2 )
+                        .animSlideLeft(delay: 0.4, bounce: .default)
                 }
             }
             .padding()

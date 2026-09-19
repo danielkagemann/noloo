@@ -13,3 +13,33 @@ final class Loo {
         self.amount = amount
     }
 }
+
+extension Array where Element: Loo {
+    func filterByDate(_ date: Date = Date()) -> [Loo] {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: date)
+        guard let endOfDay = calendar.date(byAdding: DateComponents(day: 1, second: -1), to: startOfDay) else {
+            return self
+        }
+        return self.filter { item in
+            (startOfDay ... endOfDay).contains(item.timestamp)
+        }
+    }
+    
+    func totalAmount() -> Int {
+        self.reduce(0) { $0 + $1.amount }
+    }
+    
+    func lastWeekAmount() -> [Int] {
+        var total: [Int] = []
+        var current: Date = Date()
+        
+        for _ in 1...7 {
+            guard let newDay = Calendar.current.date(byAdding: DateComponents(day: -1), to: current) else {return []}
+            current = newDay
+            total.append(self.filterByDate(current).totalAmount())
+        }
+        
+        return total
+    }
+}
