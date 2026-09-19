@@ -12,12 +12,36 @@ enum AnimationDirection {
     case vertical
 }
 
+struct BounceConfig {
+    var response: Double
+    var dampingFraction: Double
+    var blendDuration: Double
+
+    static let `default` = BounceConfig(response: 0.5, dampingFraction: 0.7, blendDuration: 0)
+}
+
+extension BounceConfig {
+    static func custom(response: Double = 0.5, dampingFraction: Double = 0.7, blendDuration: Double = 0) -> BounceConfig {
+        BounceConfig(response: response, dampingFraction: dampingFraction, blendDuration: blendDuration)
+    }
+}
+
 struct Slide: ViewModifier {
     @State var animate: Bool = false
     var direction: AnimationDirection
     var value: Double
     var delay: Double = 0
     var duration: Double = 0.5
+    
+    var bounce: BounceConfig? = nil
+
+    private var slideAnimation: Animation {
+        if let bounce {
+            return .spring(response: bounce.response, dampingFraction: bounce.dampingFraction, blendDuration: bounce.blendDuration).delay(delay)
+        } else {
+            return .easeInOut(duration: duration).delay(delay)
+        }
+    }
 
     func body(content: Content) -> some View {
         content
@@ -26,7 +50,7 @@ struct Slide: ViewModifier {
             .opacity(animate ? 1 : 0)
             .onAppear {
                 animate = false
-                withAnimation(.easeInOut(duration: duration).delay(delay)) {
+                withAnimation(slideAnimation) {
                     animate = true
                 }
             }
@@ -133,23 +157,57 @@ extension View {
         modifier(Flip(z: 1, from: from, to: to, duration: duration, delay:delay))
     }
 
-    func animSlideUp(value: Double = 30, delay: Double = 0, duration: Double = 0.8) -> some View {
-        modifier(Slide(direction: .vertical, value: value, delay: delay, duration: duration))
+    func animSlideUp(value: Double = 30,
+                     delay: Double = 0,
+                     duration: Double = 0.8,
+                     bounce: BounceConfig? = nil) -> some View {
+        modifier(Slide(direction: .vertical,
+                       value: value,
+                       delay: delay,
+                       duration: duration,
+                       bounce: bounce))
     }
 
-    func animSlideDown(value: Double = 30, delay: Double = 0, duration: Double = 0.8) -> some View {
-        modifier(Slide(direction: .vertical, value: -value, delay: delay, duration: duration))
+    func animSlideDown(value: Double = 30,
+                       delay: Double = 0,
+                       duration: Double = 0.8,
+                       bounce: BounceConfig? = nil) -> some View {
+        modifier(Slide(direction: .vertical,
+                       value: -value,
+                       delay: delay,
+                       duration: duration,
+                       bounce: bounce))
     }
 
-    func animSlideLeft(value: Double = 30, delay: Double = 0, duration: Double = 0.8) -> some View {
-        modifier(Slide(direction: .horizontal, value: value, delay: delay, duration: duration))
+    func animSlideLeft(value: Double = 30,
+                       delay: Double = 0,
+                       duration: Double = 0.8,
+                       bounce: BounceConfig? = nil) -> some View {
+        modifier(Slide(direction: .horizontal,
+                       value: value,
+                       delay: delay,
+                       duration: duration,
+                       bounce: bounce))
     }
 
-    func animSlideRight(value: Double = 30, delay: Double = 0, duration: Double = 0.8) -> some View {
-        modifier(Slide(direction: .horizontal, value: -value, delay: delay, duration: duration))
+    func animSlideRight(value: Double = 30,
+                        delay: Double = 0,
+                        duration: Double = 0.8,
+                        bounce: BounceConfig? = nil) -> some View {
+        modifier(Slide(direction: .horizontal,
+                       value: -value,
+                       delay: delay,
+                       duration: duration,
+                       bounce: bounce))
     }
 
-    func animFadeIn(delay: Double = 0, duration: Double = 0.5) -> some View {
-        modifier(Slide(direction: .horizontal, value: 0, delay: delay, duration: duration))
+    func animFadeIn(delay: Double = 0,
+                    duration: Double = 0.5,
+                    bounce: BounceConfig? = nil) -> some View {
+        modifier(Slide(direction: .horizontal,
+                       value: 0,
+                       delay: delay,
+                       duration: duration,
+                       bounce: bounce))
     }
 }
