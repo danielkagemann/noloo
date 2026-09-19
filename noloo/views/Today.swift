@@ -20,9 +20,7 @@ struct Today: View {
     @ViewBuilder
     func Missing() -> some View {
         let remaining = dailyLoo - value
-        if remaining == dailyLoo {
-            Text("Start now.").padding(.top, 8)
-        } else if remaining > 0 {
+        if remaining > 0 {
             Text("Only \(dailyLoo - value)ml missing. ").padding(.top, 8)
         } else {
             Text("💧 You have reached your daily goal!")
@@ -30,34 +28,37 @@ struct Today: View {
     }
 
     var body: some View {
-        VStack {
-            HStack {
-                VStack(alignment: .leading, spacing: -2) {
-                    Text("Today")
-                        .font(.headline)
-                        .flipX(from: -180, to: 0)
-                    Text("\(value) ml").font(.title).bold()
-                        .slideRight(value: 100, delay: 0.1)
-                    Text("von \(dailyLoo) ml")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fadeIn()
-                    Missing()
+        if value > 0 {
+            VStack {
+                HStack {
+                    VStack(alignment: .leading, spacing: -2) {
+                        Text("Today")
+                            .font(.headline)
+                            .animFlipX(from: -180, to: 0)
+                        Text("\(value) ml").font(.title).bold()
+                            .animSlideRight(value: 100, delay: 0.1)
+                        Text("von \(dailyLoo) ml")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .animSlideUp(delay: 0.2)
+                        Missing()
+                    }
+                    Spacer()
+                    Text("\((value * 100) / dailyLoo)%").bold().foregroundStyle(.secondary)
+                        .animSlideRight(delay: 0.2 )
                 }
-                Spacer()
-                Text("\((value * 100) / dailyLoo)%").bold().foregroundStyle(.secondary)
             }
+            .padding()
+            .onTapGesture {
+                showSettings.toggle()
+            }
+            .sheet(isPresented: $showSettings, content: {
+                SettingsView()
+            })
         }
-        .padding()
-        .onTapGesture {
-            showSettings.toggle()
-        }
-        .sheet(isPresented: $showSettings, content: {
-            SettingsView()
-        })
     }
 }
 
 #Preview {
-    Today(value: 210)
+    Today(value: 1)
 }

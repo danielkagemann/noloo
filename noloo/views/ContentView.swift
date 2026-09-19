@@ -33,35 +33,23 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
-    func EmptyState() -> some View {
-        if filteredForToday.isEmpty {
-            Text("You should drink something.\nChoose the amount at the bottom.\nIf you want to change your goal just tap on the header. ")
-                .flipX(from: 90, to: 0, duration: 1)
-                .slideDown(value: 100, delay: 0.2)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-                .padding(.vertical, 32)
-        }
-    }
-
     func ActionButtons() -> some View {
         HStack(spacing: 12) {
             ForEach([20, 50, 100], id: \.self, content: { (value: Int) in
                 Button("+\(value)ml") { addItem(value) }
                     .buttonStyle(.bordered)
                     .tint(.accent)
-                    .slideUp(value: 50, delay: Double(value/1000))
+                    .animSlideUp(value: 50, delay: Double(value / 1000))
                     .flyingSymbol {
                         Image(systemName: "drop.fill")
-                                .font(.title3)
-                                .foregroundStyle(.blue)
+                            .font(.title3)
+                            .foregroundStyle(.blue)
                     }
             })
             Button("+250ml") { addItem(250) }
                 .buttonStyle(.borderedProminent)
                 .tint(.accent)
-                .slideUp(value: 10, delay: 0.25)
+                .animSlideUp(value: 10, delay: 0.25)
         }
     }
 
@@ -94,7 +82,7 @@ struct ContentView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .padding(.horizontal)
             .padding(.top)
-            .slideDown(value: 50)
+            .animSlideDown(value: 50)
         }
     }
 
@@ -105,7 +93,6 @@ struct ContentView: View {
 
     func LooItemList() -> some View {
         ScrollView {
-            EmptyState()
             LazyVGrid(columns: columns, spacing: 6) {
                 ForEach(filteredForToday) { item in
                     LooItemView(item: item) {
@@ -119,13 +106,22 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
+        if todayTotal == 0 {
             VStack {
-                Today(value: todayTotal)
-                LooItemList()
+                Spacer()
+                EmptyLooView()
+                Spacer()
                 ActionButtons()
             }
-            Notification()
+        } else {
+            ZStack(alignment: .top) {
+                VStack {
+                    Today(value: todayTotal)
+                    LooItemList()
+                    ActionButtons()
+                }
+                Notification()
+            }
         }
     }
 
