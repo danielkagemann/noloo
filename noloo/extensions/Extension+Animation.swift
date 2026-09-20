@@ -337,3 +337,62 @@ private struct _CountUpWrapper: ViewModifier {
             }
     }
 }
+// MARK: - Shake Animation
+
+/// Shakes a view horizontally, useful for error emphasis or attention grabbing.
+/// You can control amplitude, duration, delay, and repeat behavior.
+private struct Shake: ViewModifier {
+    @State private var animating: Bool = false
+
+    /// Maximum horizontal offset from center in points.
+    var amplitude: CGFloat = 10
+    /// Duration of one full shake cycle (left to right and back if using autoreverses).
+    var duration: Double = 0.4
+    /// Delay before the first shake starts.
+    var delay: Double = 0
+    /// Number of times to repeat the shake. Use nil to repeat forever.
+    var repeatCount: Int? = 1
+    /// Whether the animation should autoreverse.
+    var autoreverses: Bool = true
+
+    func body(content: Content) -> some View {
+        content
+            .offset(x: animating ? amplitude : -amplitude, y: 0)
+            .onAppear {
+                animating = false
+                var base = Animation.easeInOut(duration: duration / 2).delay(delay)
+                // Build repeat behavior: if repeatCount specified, repeat that many times; otherwise repeat forever.
+                if let count = repeatCount {
+                    base = base.repeatCount(count * (autoreverses ? 2 : 1), autoreverses: autoreverses)
+                } else {
+                    base = base.repeatForever(autoreverses: autoreverses)
+                }
+                withAnimation(base) {
+                    animating = true
+                }
+            }
+    }
+}
+
+extension View {
+    /// Applies a horizontal shake animation.
+    /// - Parameters:
+    ///   - amplitude: Maximum horizontal travel from center in points (default 10).
+    ///   - duration: Duration of a full shake cycle (default 0.4s).
+    ///   - delay: Delay before the first shake starts.
+    ///   - repeatCount: Number of cycles to run; pass nil to repeat forever (default 1).
+    ///   - autoreverses: Whether to bounce back automatically (default true).
+    /// - Returns: The view with a shake animation applied.
+    func animShake(amplitude: CGFloat = 10,
+                   duration: Double = 0.4,
+                   delay: Double = 0,
+                   repeatCount: Int? = 1,
+                   autoreverses: Bool = true) -> some View {
+        modifier(Shake(amplitude: amplitude,
+                       duration: duration,
+                       delay: delay,
+                       repeatCount: repeatCount,
+                       autoreverses: autoreverses))
+    }
+}
+

@@ -157,6 +157,7 @@ struct ContentView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(height: 200)
+                            
                         Today(value: todayTotal)
                     }
                     LooItemList()
