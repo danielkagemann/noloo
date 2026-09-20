@@ -32,7 +32,7 @@ struct ContentView: View {
 
     func ActionButtons() -> some View {
         VStack {
-            Divider().padding(.bottom, 16).animFadeIn(delay:0.5)
+            Divider().padding(.bottom, 16).animFadeIn(delay: 0.5)
             HStack(spacing: 12) {
                 ForEach([20, 50, 100], id: \.self, content: { (value: Int) in
                     Button("+\(value)ml") { addItem(value) }
@@ -157,7 +157,6 @@ struct ContentView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(height: 200)
-                            
                         Today(value: todayTotal)
                     }
                     LooItemList()
@@ -196,7 +195,7 @@ struct ContentView: View {
             }
         }
     }
-    
+
     private func updateNotifications() {
         if remindersEnabled {
             Task {

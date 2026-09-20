@@ -40,7 +40,7 @@ struct Today: View {
             }
             .padding()
             .background(.accent.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
 
         } else {
             Text("Tagesziel erreicht!")

@@ -335,6 +335,14 @@ private struct _CountUpWrapper: ViewModifier {
                     current = to
                 }
             }
+            .onChange(of: to) { oldValue, newValue in
+                // restart from the current displayed value to the new target
+                let start = oldValue
+                current = start
+                withAnimation(.easeOut(duration: duration).delay(delay)) {
+                    current = newValue
+                }
+            }
     }
 }
 // MARK: - Shake Animation
