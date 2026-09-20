@@ -10,7 +10,7 @@ import SwiftUI
 struct Today: View {
     /// input
     let value: Int
-    
+
     /// states
     @State private var showSettings: Bool = false
 
@@ -21,14 +21,18 @@ struct Today: View {
     func Missing() -> some View {
         let remaining = dailyLoo - value
         if remaining > 0 {
-            HStack (spacing: 16){
+            HStack(spacing: 16) {
                 Image(systemName: "drop.fill")
                     .font(.system(size: 32))
                     .foregroundStyle(.accent)
                     .animSlideDown(bounce: .default)
-                VStack (alignment: .leading) {
+                VStack(alignment: .leading) {
                     Text("Noch")
-                    Text("\(dailyLoo - value)ml")
+                    Text("")
+                        .animCountUp(from: 0,
+                                     to: Double(dailyLoo - value),
+                                     suffix: "ml"
+                        )
                         .bold()
                         .font(.headline)
                 }
@@ -37,7 +41,7 @@ struct Today: View {
             .padding()
             .background(.accent.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: 8))
-            
+
         } else {
             Text("Tagesziel erreicht!")
         }
@@ -52,10 +56,13 @@ struct Today: View {
                         Text("Heute")
                             .font(.headline)
                             .animFlipX(from: -180, to: 0)
-                        Text("\(value) ml")
+                        Text("")
+                            .animCountUp(from: 0,
+                                         to: Double(value), duration: 1.2,
+                                         suffix: "ml"
+                                         )
                             .font(.largeTitle)
                             .bold()
-                            .animFlipX(from: -180, to: 0, duration: 0.5)
                         Text("von \(dailyLoo) ml")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
@@ -74,7 +81,7 @@ struct Today: View {
                 .onTapGesture {
                     showSettings.toggle()
                 }
-                
+
                 // show missing
                 Missing()
             }
@@ -87,5 +94,5 @@ struct Today: View {
 }
 
 #Preview {
-    Today(value: 1)
+    Today(value: 20)
 }

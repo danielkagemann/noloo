@@ -26,10 +26,18 @@ struct LastDaysView: View {
                 VStack {
                     Text(date.toFormat("EEE"))
                         .font(.caption)
+                        .bold()
                     Text("\(value)ml")
-                        .font(.callout)
+                        .font(.caption)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .fixedSize(horizontal: true, vertical: false)
                         .fontWeight(value < dailyLoo ? .regular : .bold)
                 }
+                .padding(4)
+                .frame(minHeight: 56, alignment: .center)
+                .background(.accent.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
         .padding(.horizontal)

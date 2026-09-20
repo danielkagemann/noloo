@@ -291,15 +291,17 @@ extension View {
     ///   - to: Target value.
     ///   - duration: Animation duration in seconds (default 0.8).
     ///   - delay: Optional delay before starting.
+    ///   - suffix: Optional text to add after the value.
     ///   - style: A `FormatStyle` for Double, e.g. `.number.precision(.fractionLength(0))`.
     /// - Returns: A view displaying an animated number.
     func animCountUp(from: Double = 0,
                      to: Double,
                      duration: Double = 0.8,
+                     suffix: String = "",
                      delay: Double = 0,
-                     style: some Foundation.FormatStyle<Double, String> = .number) -> some View {
+                     style: some Foundation.FormatStyle<Double, String> = .number.precision(.fractionLength(0))) -> some View {
         animCountUp(from: from, to: to, duration: duration, delay: delay) { value in
-            value.formatted(style)
+            value.formatted(style) + suffix
         }
     }
 

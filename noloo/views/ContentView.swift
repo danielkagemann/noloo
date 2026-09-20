@@ -5,13 +5,15 @@ struct ContentView: View {
     /// env
     @Environment(\.modelContext) private var modelContext
     @Environment(\.undoManager) private var undoManager
+    @Environment(\.scenePhase) private var scenePhase
 
     /// query
     @Query(sort: [SortDescriptor<Loo>(\.timestamp, order: .reverse)]) private var items: [Loo]
 
     /// app storage for daily goal (in ml)
     @AppStorage("DailyLoo") private var dailyLoo: Int = 2000
-    
+    @AppStorage("notification") private var remindersEnabled: Bool = false
+
     /// states
     @State private var bannerMessage: String? = nil
     @State private var bannerShowsUndo: Bool = false
@@ -29,22 +31,25 @@ struct ContentView: View {
     }
 
     func ActionButtons() -> some View {
-        HStack(spacing: 12) {
-            ForEach([20, 50, 100], id: \.self, content: { (value: Int) in
-                Button("+\(value)ml") { addItem(value) }
-                    .buttonStyle(.glass)
+        VStack {
+            Divider().padding(.bottom, 16).animFadeIn(delay:0.5)
+            HStack(spacing: 12) {
+                ForEach([20, 50, 100], id: \.self, content: { (value: Int) in
+                    Button("+\(value)ml") { addItem(value) }
+                        .buttonStyle(.glass)
+                        .tint(.accent)
+                        .animSlideUp(value: 50, delay: Double(value / 1000))
+                        .flyingSymbol {
+                            Image(systemName: "drop.fill")
+                                .font(.title3)
+                                .foregroundStyle(.blue)
+                        }
+                })
+                Button("+250ml") { addItem(250) }
+                    .buttonStyle(.glassProminent)
                     .tint(.accent)
-                    .animSlideUp(value: 50, delay: Double(value / 1000))
-                    .flyingSymbol {
-                        Image(systemName: "drop.fill")
-                            .font(.title3)
-                            .foregroundStyle(.blue)
-                    }
-            })
-            Button("+250ml") { addItem(250) }
-                .buttonStyle(.glassProminent)
-                .tint(.accent)
-                .animSlideUp(value: 10, delay: 0.25)
+                    .animSlideUp(value: 10, delay: 0.25)
+            }
         }
     }
 
@@ -81,20 +86,19 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
     func LooItemList() -> some View {
-        VStack (alignment: .leading) {
+        VStack(alignment: .leading) {
             Text("Letzte Einträge")
                 .font(.title2)
                 .alignLeft()
-            
+
             HStack {
-                ForEach(filteredForToday.prefix(3)) {item in
+                ForEach(filteredForToday.prefix(3)) { item in
                     LooItemView(item: item) {
                         deleteItemWithUndo(item)
                     }
                 }
-                
+
                 if filteredForToday.count > 3 {
                     Button(action: {
                         showAllItems.toggle()
@@ -108,9 +112,10 @@ struct ContentView: View {
             }
             Spacer()
         }
+        .padding(.top, 16)
         .padding(.horizontal)
     }
-    
+
     var whichGlas: String {
         let percent = (todayTotal * 100) / dailyLoo
         if percent < 25 {
@@ -133,7 +138,7 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 EmptyLooView()
-                VStack (spacing: 8){
+                VStack(spacing: 8) {
                     ForEach([20, 50, 100, 250], id: \.self, content: { (value: Int) in
                         Button("+\(value)ml") { addItem(value) }
                             .buttonStyle(.glassProminent)
@@ -144,8 +149,8 @@ struct ContentView: View {
                 Spacer()
             }
         } else {
-            ZStack(alignment: .bottom) {
-                VStack (spacing: 32) {
+            ZStack(alignment: .top) {
+                VStack(spacing: 32) {
                     LastDaysView()
                     HStack {
                         Image(whichGlas)
@@ -162,12 +167,12 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showAllItems) {
-                VStack (alignment: .leading) {
+                VStack(alignment: .leading) {
                     Text("Alle heutigen Einträge")
                         .font(.title2)
-                    
+
                     Text("Tippe auf einen Eintrag um ihn zu löschen")
-                    
+
                     ScrollView {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4), spacing: 12) {
                             ForEach(filteredForToday) { item in
@@ -183,6 +188,29 @@ struct ContentView: View {
                 .padding(.vertical, 32)
                 .padding(.horizontal, 16)
             }
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .active else { return }
+
+                updateNotifications()
+            }
+        }
+    }
+    
+    private func updateNotifications() {
+        if remindersEnabled {
+            Task {
+                do {
+                    try await NotificationManager.shared.reschedule(
+                        today: HydrationSnapshot(
+                            consumedML: todayTotal,
+                            goalML: dailyLoo
+                        ),
+                        tomorrowGoalML: dailyLoo
+                    )
+                } catch {
+                    print("Unable to update notifications: \(error)")
+                }
+            }
         }
     }
 
@@ -190,6 +218,8 @@ struct ContentView: View {
         let new = Loo(amount: value)
         modelContext.insert(new)
         showBanner(message: "+\(value) ml hinzugefügt", showsUndo: false)
+
+        updateNotifications()
     }
 
     private func deleteItems(at offsets: IndexSet) {

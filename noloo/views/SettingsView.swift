@@ -13,6 +13,7 @@ struct SettingsView: View {
 
     /// app storage for daily goal (in ml)
     @AppStorage("DailyLoo") private var dailyLoo: Int = 2000
+    @AppStorage("notification") private var remindersEnabled: Bool = false
 
     var body: some View {
         VStack {
@@ -28,6 +29,40 @@ struct SettingsView: View {
                 .font(.title)
             Text("ml")
 
+            Toggle(
+                "Stündliche Erinnerungen",
+                isOn: $remindersEnabled
+            )
+            .onChange(of: remindersEnabled) { _, enabled in
+                Task {
+                    if enabled {
+                        do {
+                            let granted = try await NotificationManager
+                                .shared
+                                .requestAuthorization()
+
+                            guard granted else {
+                                remindersEnabled = false
+                                return
+                            }
+
+                            try await NotificationManager.shared.reschedule(
+                                today: HydrationSnapshot(
+                                    consumedML: 750,
+                                    goalML: 2500
+                                ),
+                                tomorrowGoalML: 2500
+                            )
+
+                        } catch {
+                            remindersEnabled = false
+                            print("Notification error: \(error)")
+                        }
+                    } else {
+                        await NotificationManager.shared.cancelAll()
+                    }
+                }
+            }
             Button("Fertig") {
                 dismiss()
             }
